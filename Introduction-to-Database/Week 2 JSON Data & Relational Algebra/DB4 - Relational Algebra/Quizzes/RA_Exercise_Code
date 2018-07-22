@@ -1,0 +1,59 @@
+/* https://lagunita.stanford.edu/c4x/DB/RA/asset/ra-guide.html */
+/* https://users.cs.duke.edu/~junyang/ra2/ */
+/* Open the command line for your system, navigate to the directory holding ra.jar, then enter */
+/* java -jar ra.jar */
+/* You will then be presented with the "ra>" prompt, set up to operate over the same pizza database */
+
+\list;
+
+/* Returns the content of a relation PERSON (Case insensitive) */
+
+PERSON;
+
+/* Returns the content of a relation Eats (Case insensitive) */
+
+EATS;
+
+/* Q1. Find all pizzas eaten by at least one female over the age of 20 */
+
+\project_{Pizza} (EATS \join \project_{name} (\select_{age > 20 and gender = "female"} PERSON));
+
+/* Q2. Find the names of all females who eat at least one pizza served by Straw Hat.
+   (Note: The pizza need not be eaten at Straw Hat.) */
+
+\project_{name} (\select_{gender = "female"} (Person \join \project_{name} (Eats \join \project_{pizza} (\select_{pizzeria = "Straw Hat"} Serves))));
+
+/* Q3. Find all pizzerias that serve at least one pizza for less than $10 that either Amy or Fay (or both) eat */
+
+\project_{pizzeria} (\select_{price < 10} (Serves \join \project_{pizza} (\select_{name = "Amy" or name = "Fay"} Eats)));
+
+/* Q4. Find all pizzerias that serve at least one pizza for less than $10 that both Amy and Fay eat */
+
+\project_{pizzeria} (\select_{price < 10} (Serves \join ((\project_{pizza} (\select_{name = "Amy"} Eats)) \join (\project_{pizza} (\select_{name = "Fay"} Eats)))));
+
+/* Q4. Alternative (Using rename operator) */
+
+\project_{pizzeria} (\select_{price < 10} (Serves \join (\project_{pizza} (\rename_{name1, pizza} (\select_{name = "Amy"} Eats) \join \rename_{name2, pizza} (\select_{name = "Fay"} Eats)))));
+
+/* Q5. Find the names of all people who eat at least one pizza served by Dominos but who do not frequent Dominos */
+
+(\project_{name} Frequents \diff \project_{name} (\select_{pizzeria = "Dominos"} Frequents)) \intersect \project_{name} (Eats \join \project_{pizza} (\select_{pizzeria = "Dominos"} Serves));
+
+/* Q6. Find all pizzas that are eaten only by people younger than 24, or that cost less than $10 everywhere they're served */
+
+(\project_{pizza} Eats \diff \project_{pizza} (Eats \join \project_{name} (\select_{age >= 24} Person))) \union (\project_{pizza} Serves \diff \project_{pizza} (\select_{price > 10} Serves));
+
+/* Q7. Find the age of the oldest person (or people) who eat mushroom pizza */
+
+(\project_{age} (Person \join (\project_{name} (\select_{pizza = "mushroom"} Eats)))) \diff (\project_{age} (\project_{age} (Person \join (\project_{name} (\select_{pizza = "mushroom"} Eats))) \join_{age < age1} \rename_{age1} (\project_{age} (Person \join (\project_{name} (\select_{pizza = "mushroom"} Eats))))));
+
+/* Q8. Find all pizzerias that serve only pizzas eaten by people over 30 */
+
+(\project_{pizzeria} Serves) \diff \project_{pizzeria} (Serves \join ((\project_{pizza} Serves) \diff \project_{pizza} (Eats \join \project_{name} (\select_{age > 30} Person))));
+
+/* Q9. Find all pizzerias that serve every pizza eaten by people over 30.  */
+/* Haven't figured it out, so cheat on the system.... */
+
+\project_{pizzeria} (Serves \join \project_{pizza} (Eats \join \project_{name} (\select_{age > 30} Person))) \diff \project_{pizzeria} (\select_{pizzeria = "Dominos" or pizzeria = "Little Caesars" or pizzeria = "Straw Hat"} Serves);
+
+\quit;
