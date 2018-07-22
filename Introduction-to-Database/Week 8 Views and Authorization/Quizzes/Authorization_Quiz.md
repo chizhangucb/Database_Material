@@ -85,7 +85,7 @@ Which of the following privileges is not useful for execution of this SQL statem
 * `SELECT ON R(c)`
 
 **Explanation:** 
-We need to have read access to T.a, because it is referred to in "WHERE a <= ALL ..." and "WHERE f > T.a". Thus, we need privilege SELECT ON T(a) or SELECT ON T. The subquery "(SELECT d FROM R)" requires privilege SELECT ON R(d) or SELECT ON R. The subquery "(SELECT f FROM S WHERE f > T.a)" requires privilege SELECT ON S(f) or SELECT ON f. Finally, we need to update T.a and T.b, so either UPDATE ON T(a) and UPDATE ON T(b), or else UPDATE ON T, is needed. No other privileges are useful for executing the statement.
+We need to have read access to T.a, because it is referred to in `WHERE a <= ALL ...` and `WHERE f > T.a`. Thus, we need privilege `SELECT ON T(a)` or `SELECT ON T`. The subquery `(SELECT d FROM R)` requires privilege `SELECT ON R(d)` or `SELECT ON R`. The subquery `(SELECT f FROM S WHERE f > T.a)` requires privilege `SELECT ON S(f)` or `SELECT ON f`. Finally, we need to update T.a and T.b, so either UPDATE ON T(a) and UPDATE ON T(b), or else UPDATE ON T, is needed. No other privileges are useful for executing the statement.
 
 Eg.
 * `SELECT ON T`. This privilege is useful for the reference to T.a in the WHERE clause.
@@ -116,4 +116,4 @@ Which of the following statements is true?
 * X does not have privilege SELECT ON T after statement 6. 
 
 **Explanation:** 
-As owner, U has all privileges on T. Let P denote the privilege "SELECT ON T". After statement 1, V and W have privilege P granted by U. After statement 2, W is additionally granted privilege P by V. After statement 3, X and Y also have privilege P, granted by W. After statement 4, Y is additionally granted privilege P by U. After statement 5, V no longer has privilege P. ***The "restrict" does not block the statement*** since there is no cascading revoking of privileges (W still has privilege P from U). After statement 6, W loses privilege P and so does X since it was granted by W, but Y still retains privilege granted from U.
+As owner, U has all privileges on T. Let P denote the privilege `SELECT ON T`. After statement 1, V and W have privilege P granted by U. After statement 2, W is additionally granted privilege P by V. After statement 3, X and Y also have privilege P, granted by W. After statement 4, Y is additionally granted privilege P by U. After statement 5, V no longer has privilege P. ***The "restrict" does not block the statement*** since there is no cascading revoking of privileges (W still has privilege P from U). After statement 6, W loses privilege P and so does X since it was granted by W, but Y still retains privilege granted from U.
